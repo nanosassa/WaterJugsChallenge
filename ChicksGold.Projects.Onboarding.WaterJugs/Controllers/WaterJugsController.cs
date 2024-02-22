@@ -16,11 +16,10 @@ namespace ChicksGold.Projects.Onboarding.WaterJugs.Controllers
             _logger = logger;
         }
 
-        [HttpGet(Name="Solve")]
+        [HttpGet("Solve")]
         public ActionResult<List<State>> Solve(int jugX, int jugY, int target)
         {
-            return Solver.SolveWaterJugChallenge(jugX, jugY, target);
-            
+            return MainLogic.Solve(jugX, jugY, target);            
         }
     }
 }

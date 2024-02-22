@@ -1,90 +1,72 @@
 ﻿using ChicksGold.Projects.Onboarding.WaterJugs.Models;
-using System.ComponentModel;
-using System.Linq;
 
 namespace ChicksGold.Projects.Onboarding.WaterJugs.Helpers
 {
     public static class MainLogic
     {
-       //public static List<State> Solve(Jug jugX, Jug jugY, int target)
-       // {
-       //     Queue<State> queue = new Queue<State>();
-       //     HashSet<State> visited = new HashSet<State>();
+        public static List<State> Solve(int x, int y, int z)
+        {
+            var visited = new HashSet<string>();
+            var queue = new Queue<Tuple<Jug, Jug, List<State>>>();
+            queue.Enqueue(new Tuple<Jug, Jug, List<State>>(new Jug(x), new Jug(y), new List<State>()));
 
-       //     List<State> path = new List<State>();
+            while (queue.Count > 0)
+            {
+                var (jugX, jugY, actions) = queue.Dequeue();
 
-       //     queue.Enqueue(new State(0, 0));
-       //     visited.Add(new State(0, 0));
+                if (jugX.CurrentAmount == z || jugY.CurrentAmount == z)
+                {
+                    return actions;
+                }
 
-       //     while (queue.Count > 0)
-       //     {
-       //         State current = queue.Dequeue();
+                var state = $"{jugX.CurrentAmount},{jugY.CurrentAmount}";
+                if (visited.Contains(state))
+                {
+                    continue;
+                }
 
-       //         if (current.x == target || current.y == target)
-       //         {
-       //             path.Add(current);
-       //             return path;
-       //         }
+                visited.Add(state);
 
-       //         foreach (State next in GetNextStates(jugX, jugY, current))
-       //         {
-       //             if (!visited.Contains(next))
-       //             {
-       //                 queue.Enqueue(next);
-       //                 visited.Add(next);
-       //                 path.Add(current);
-       //             }
-       //         }
-       //     }
+                // Fill jug X
+                var newJugX = new Jug(x) { CurrentAmount = x };
+                var newActions = new List<State>(actions) { new State { BucketX = newJugX.CurrentAmount, BucketY = jugY.CurrentAmount, Explanation = "Fill bucket X" } };
+                queue.Enqueue(new Tuple<Jug, Jug, List<State>>(newJugX, jugY, newActions));
 
-       //     return null;
-       // }
+                // Fill jug Y
+                var newJugY = new Jug(y) { CurrentAmount = y };
+                newActions = new List<State>(actions) { new State { BucketX = jugX.CurrentAmount, BucketY = newJugY.CurrentAmount, Explanation = "Fill bucket Y" } };
+                queue.Enqueue(new Tuple<Jug, Jug, List<State>>(jugX, newJugY, newActions));
 
-       //static List<State> GetNextStates(Jug jugX, Jug jugY, State current)
-       // {
-       //     List<State> nextStates = new List<State>();
+                // Empty jug X
+                newJugX = new Jug(x) { CurrentAmount = 0 };
+                newActions = new List<State>(actions) { new State { BucketX = newJugX.CurrentAmount, BucketY = jugY.CurrentAmount, Explanation = "Empty bucket X" } };
+                queue.Enqueue(new Tuple<Jug, Jug, List<State>>(newJugX, jugY, newActions));
 
-       //     // Fill X
-       //     if (current.x < jugX.Capacity)
-       //     {
-       //         nextStates.Add(new State(jugX.Capacity, current.y));
-       //     }
+                // Empty jug Y
+                newJugY = new Jug(y) { CurrentAmount = 0 };
+                newActions = new List<State>(actions) { new State { BucketX = jugX.CurrentAmount, BucketY = newJugY.CurrentAmount, Explanation = "Empty bucket Y" } };
+                queue.Enqueue(new Tuple<Jug, Jug, List<State>>(jugX, newJugY, newActions));
 
-       //     // Fill Y 
-       //     if (current.y < jugY.Capacity)
-       //     {
-       //         nextStates.Add(new State(current.x, jugY.Capacity));
-       //     }
+                // Transfer from X to Y
+                int amountToTransfer = Math.Min(jugX.CurrentAmount, y - jugY.CurrentAmount);
+                newJugX = new Jug(x) { CurrentAmount = jugX.CurrentAmount - amountToTransfer };
+                newJugY = new Jug(y) { CurrentAmount = jugY.CurrentAmount + amountToTransfer };
+                newActions = new List<State>(actions) { new State { BucketX = newJugX.CurrentAmount, BucketY = newJugY.CurrentAmount, Explanation = "Transfer from bucket X to bucket Y" } };
+                queue.Enqueue(new Tuple<Jug, Jug, List<State>>(newJugX, newJugY, newActions));
 
-       //     // Empty X
-       //     if (current.x > 0)
-       //     {
-       //         nextStates.Add(new State(0, current.y));
-       //     }
+                // Transfer from Y to X
+                amountToTransfer = Math.Min(jugY.CurrentAmount, x - jugX.CurrentAmount);
+                newJugX = new Jug(x) { CurrentAmount = jugX.CurrentAmount + amountToTransfer };
+                newJugY = new Jug(y) { CurrentAmount = jugY.CurrentAmount - amountToTransfer };
+                newActions = new List<State>(actions) { new State { BucketX = newJugX.CurrentAmount, BucketY = newJugY.CurrentAmount, Explanation = "Transfer from bucket Y to bucket X" } };
+                queue.Enqueue(new Tuple<Jug, Jug, List<State>>(newJugX, newJugY, newActions));
+            }
 
-       //     // Empty Y
-       //     if (current.y > 0)
-       //     {
-       //         nextStates.Add(new State(current.x, 0));
-       //     }
+            // If we have explored all possible states and have not found a solution, we return a state to indicate that there is no solution.
+            var noSolution = new List<State>();
+            noSolution.Add(new State() { Explanation = "No Solution" });
 
-       //     // X -> Y
-       //     int spaceInY = jugY.Capacity - current.y;
-       //     int transferAmount = Math.Min(spaceInY, current.x);
-       //     if (transferAmount > 0)
-       //     {
-       //         nextStates.Add(new State(current.x - transferAmount, current.y + transferAmount));
-       //     }
-
-       //     // Y -> X 
-       //     spaceInY = jugX.Capacity - current.x;
-       //     transferAmount = Math.Min(spaceInY, current.y);
-       //     if (transferAmount > 0)
-       //     {
-       //         nextStates.Add(new State(current.x + transferAmount, current.y - transferAmount));
-       //     }
-
-       //     return nextStates;
-       // }
+            return noSolution ;
+        }
     }
 }
