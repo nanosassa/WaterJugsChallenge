@@ -19,11 +19,23 @@ Here are some test cases you can use to validate the solution:
 3. Test Case 3: `x = 2, y = 6, z = 5`
    Expected Outcome: "No Solution", as it's impossible to measure 5 liters of water with jugs of 2 and 6 liters.
 
+## Running the Tests
+
+To run the tests, follow these steps:
+
+1. Open your project in Visual Studio.
+2. Build your solution.
+3. Open the Test Explorer window (go to Test > Windows > Test Explorer).
+4. Click on "Run All" in the Test Explorer window to run all your tests.
+
+The tests will then run, and you'll be able to see the results in the Test Explorer window. If a test fails, you can click on it to see more details about what went wrong.
+
 ## Instruction to Run the Program
 
 1. Clone the repository to your local machine.
 2. Navigate to the project directory.
 3. Run the program using the .NET CLI: `dotnet run`.
+4. Upon running the program, a Swagger window will open where you can manually test the endpoint.
 
 ## Contributing
 
