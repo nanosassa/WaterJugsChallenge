@@ -1,31 +1,58 @@
 ﻿using ChicksGold.Projects.Onboarding.WaterJugs.Models;
+using System;
+using System.Collections.Generic;
 
 namespace ChicksGold.Projects.Onboarding.WaterJugs.Helpers
 {
+    // The MainLogic class contains the main logic for solving the water jug problem.
     public static class MainLogic
     {
+        // The Solve method solves the water jug problem for given capacities of the jugs and a target amount of water.
+        // It uses a breadth-first search algorithm to explore all possible states of the jugs.
         public static List<State> Solve(int x, int y, int z)
         {
+                        
+            // Validation of non negative arguments
+            if (x <= 0 || y <= 0 || z <= 0)
+            {
+                throw new ArgumentException("X, Y, and Z must be greater than 0.");
+            }
+
+            // The visited set keeps track of the states that have already been visited.
             var visited = new HashSet<string>();
+
+            // The queue stores the states to be visited, along with the actions that led to each state.
             var queue = new Queue<Tuple<Jug, Jug, List<State>>>();
+
+            // Initially, both jugs are empty.
             queue.Enqueue(new Tuple<Jug, Jug, List<State>>(new Jug(x), new Jug(y), new List<State>()));
 
+            // The algorithm continues until all states have been visited.
             while (queue.Count > 0)
             {
+                // Dequeue the next state and the corresponding list of actions.
                 var (jugX, jugY, actions) = queue.Dequeue();
 
+                // If either jug contains the target amount of water, a solution has been found.
                 if (jugX.CurrentAmount == z || jugY.CurrentAmount == z)
                 {
                     return actions;
                 }
 
+                // The current state is represented as a string.
                 var state = $"{jugX.CurrentAmount},{jugY.CurrentAmount}";
+
+                // If the current state has already been visited, skip it.
                 if (visited.Contains(state))
                 {
                     continue;
                 }
 
+                // Mark the current state as visited.
                 visited.Add(state);
+
+                // The following blocks of code enqueue the states resulting from each possible action.
+                // Each new state is accompanied by a new list of actions, which is a copy of the current list of actions plus the new action.
 
                 // Fill jug X
                 var newJugX = new Jug(x) { CurrentAmount = x };
@@ -62,11 +89,11 @@ namespace ChicksGold.Projects.Onboarding.WaterJugs.Helpers
                 queue.Enqueue(new Tuple<Jug, Jug, List<State>>(newJugX, newJugY, newActions));
             }
 
-            // If we have explored all possible states and have not found a solution, we return a state to indicate that there is no solution.
+            // If all states have been visited and no solution has been found, return a state indicating that there is no solution.
             var noSolution = new List<State>();
             noSolution.Add(new State() { Explanation = "No Solution" });
 
-            return noSolution ;
+            return noSolution;
         }
     }
 }
