@@ -37,10 +37,3 @@ The tests will then run, and you'll be able to see the results in the Test Explo
 3. Run the program using the .NET CLI: `dotnet run`.
 4. Upon running the program, a Swagger window will open where you can manually test the endpoint.
 
-## Contributing
-
-Contributions are welcome! Please read the contributing guidelines before getting started.
-
-## License
-
-This project is licensed under the terms of the MIT license. See the LICENSE file for details.
